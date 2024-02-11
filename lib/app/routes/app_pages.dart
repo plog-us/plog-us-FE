@@ -1,0 +1,21 @@
+import 'package:get/get.dart';
+import 'package:plog_us/app/view/main_page/main_page.dart';
+import '../bindings/main_binding.dart';
+part './app_routes.dart';
+
+class AppPages {
+  AppPages._();
+
+  // LOGIN 페이지 추가되면 바꾸기
+  static const INITIAL = Routes.MAIN;
+
+  static final pages = [
+    GetPage(
+      name: _Paths.MAIN,
+      page: () => MainPage(),
+      binding: MainBinding(),
+      transition: Transition.fadeIn,
+    ),
+    // TODO: Add More Pages
+  ];
+}
