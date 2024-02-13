@@ -2,9 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:plog_us/app/controllers/login/login_controller.dart';
 
 class MyPageScreen extends StatelessWidget {
@@ -16,6 +14,14 @@ class MyPageScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('마이페이지'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Get.toNamed('/setting'); // 이동할 스크린 경로 지정
+            },
+          ),
+        ],
       ),
       body: Center(
         child: FutureBuilder(

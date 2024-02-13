@@ -94,6 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
       var responseData = json.decode(response.body);
       String userId = responseData['userUuid'].toString();
       _loginController.setUserId(userId);
+      Get.toNamed('/main');
     } else {
       print('POST request failed with status: ${response.statusCode}');
       print('Response body: ${response.body}');
