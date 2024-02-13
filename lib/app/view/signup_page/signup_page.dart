@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -18,37 +19,108 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double textSize = 24.0;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('회원가입'),
-      ),
+      appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            SizedBox(
+              width: 150.0,
+              height: 50,
+              child: DefaultTextStyle(
+                style: const TextStyle(
+                  fontSize: 40.0,
+                  color: Colors.black,
+                ),
+                child: AnimatedTextKit(
+                  animatedTexts: [
+                    TypewriterAnimatedText('PlogUs',
+                        speed: const Duration(milliseconds: 250)),
+                    TypewriterAnimatedText('Welcome!'),
+                  ],
+                  repeatForever: false,
+                  totalRepeatCount: 1,
+                  onTap: () {
+                    print("Tap Event");
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 16.0),
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
+              decoration: InputDecoration(
+                labelText: '이름',
+                filled: true,
+                fillColor: Colors.grey[200],
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
             ),
             const SizedBox(height: 16.0),
             TextField(
               controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
+              decoration: InputDecoration(
+                labelText: '이메일',
+                filled: true,
+                fillColor: Colors.grey[200],
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
             ),
             const SizedBox(height: 16.0),
             TextField(
               controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'password'),
+              decoration: InputDecoration(
+                labelText: '비밀번호',
+                filled: true,
+                fillColor: Colors.grey[200],
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
               obscureText: true,
             ),
-            const SizedBox(height: 32.0),
-            ElevatedButton(
-              onPressed: () {
+            const SizedBox(height: 20.0),
+            GestureDetector(
+              onTap: () {
                 _signUp();
               },
-              child: const Text('가입하기'),
+              child: Container(
+                width: double.infinity,
+                height: 50,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black26),
+                  borderRadius: BorderRadius.circular(10),
+                  color: const Color.fromARGB(255, 0, 0, 0),
+                ),
+                child: const Text(
+                  '가입하기',
+                  style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+                ),
+              ),
             ),
           ],
         ),
