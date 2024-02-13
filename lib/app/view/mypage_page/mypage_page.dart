@@ -11,6 +11,7 @@ class MyPageScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     LoginController loginController = Get.find<LoginController>();
+    final LoginController logoutController = Get.put(LoginController());
     return Scaffold(
       appBar: AppBar(
         title: const Text('마이페이지'),
@@ -37,21 +38,41 @@ class MyPageScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircleAvatar(
-                    radius: 50,
-                    backgroundImage:
-                        NetworkImage(userData['userProfile'] ?? "image.jpg"),
+                    radius: 100,
+                    backgroundImage: userData['userProfile'] != null
+                        ? NetworkImage(userData['userProfile'])
+                        : const AssetImage('assets/images/blank_user.png')
+                            as ImageProvider,
                   ),
                   const SizedBox(height: 16),
                   Text(
                     '닉네임: ${userData['username']}',
-                    style: const TextStyle(fontSize: 18),
+                    style: const TextStyle(fontSize: 22),
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'User ID: ${userData['userUuid']}',
+                    '플로깅 총 점수: ${userData['totalPloggingScore']}',
                     style: const TextStyle(fontSize: 18),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
+                  Text(
+                    '퀴즈 총 점수: ${userData['totalQuizScore']}',
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      logoutController.setUserId("");
+                      Get.toNamed('/login');
+                    },
+                    child: const Text(
+                      '로그아웃',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16.0),
                 ],
               );
             }
