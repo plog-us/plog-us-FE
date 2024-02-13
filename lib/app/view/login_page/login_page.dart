@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:plog_us/app/controllers/login/login_controller.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:plog_us/app/view/theme/app_colors.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,8 +18,31 @@ class _LoginScreenState extends State<LoginScreen> {
   final LoginController _loginController = Get.put(LoginController());
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  bool _allFieldsFilled = false;
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+
+  @override
+  void initState() {
+    super.initState();
+
+    emailController.addListener(_checkAllFieldsFilled);
+    passwordController.addListener(_checkAllFieldsFilled);
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  void _checkAllFieldsFilled() {
+    setState(() {
+      _allFieldsFilled =
+          emailController.text.isNotEmpty && passwordController.text.isNotEmpty;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 32.0),
                 GestureDetector(
                   onTap: () {
-                    _Login();
+                    _allFieldsFilled ? _Login() : _notfilled();
                   },
                   child: Container(
                     width: double.infinity,
@@ -174,6 +198,15 @@ class _LoginScreenState extends State<LoginScreen> {
       String userId = responseData['userUuid'].toString();
       _loginController.setUserId(userId);
       Get.toNamed('/main');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: AppColors.greenOrigin,
+          content: Text(
+            "로그인에 성공했습니다.",
+            style: TextStyle(color: AppColors.black),
+          ),
+        ),
+      );
     } else {
       print('POST request failed with status: ${response.statusCode}');
       print('Response body: ${response.body}');
@@ -197,5 +230,17 @@ class _LoginScreenState extends State<LoginScreen> {
         },
       );
     }
+  }
+
+  void _notfilled() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        backgroundColor: AppColors.greenOrigin,
+        content: Text(
+          "모든 텍스트를 입력해주세요",
+          style: TextStyle(color: AppColors.black),
+        ),
+      ),
+    );
   }
 }
