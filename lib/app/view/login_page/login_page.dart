@@ -4,6 +4,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:plog_us/app/controllers/login/login_controller.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -22,38 +23,116 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(
-                labelText: '이메일',
-              ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 40.0),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12.0),
+                  child: Image.asset(
+                    'assets/images/plant.png', // 로고 이미지 경로
+                    width: 150, // 이미지 너비
+                    height: 150, // 이미지 높이
+                  ),
+                ),
+                const SizedBox(height: 20.0),
+                TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    labelText: '이메일',
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: '비밀번호',
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32.0),
+                GestureDetector(
+                  onTap: () {
+                    _Login();
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    height: 50,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black26),
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                    ),
+                    child: const Text(
+                      '로그인',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                GestureDetector(
+                  onTap: _handleGoogleSignIn, // _login 함수를 실행하도록 설정
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black26),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    height: 50,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset('assets/icons/ic_google.svg'),
+                        const SizedBox(width: 16),
+                        const Text(
+                          "Google로 로그인하기",
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10.0),
+                TextButton(
+                  onPressed: () {
+                    Get.toNamed('/join');
+                  },
+                  child: const Text(
+                    '회원가입',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16.0),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: '비밀번호',
-              ),
-            ),
-            const SizedBox(height: 32.0),
-            ElevatedButton(
-              onPressed: () {
-                _Login();
-              },
-              child: const Text('로그인'),
-            ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _handleGoogleSignIn,
-              child: const Text('Google로 로그인'),
-            ),
-          ],
+          ),
         ),
       ),
     );

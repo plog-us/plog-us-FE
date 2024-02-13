@@ -32,6 +32,12 @@ class AppPages {
       binding: MainBinding(),
       transition: Transition.downToUp,
     ),
+    GetPage(
+      name: _Paths.JOIN,
+      page: () => const SignUpScreen(),
+      binding: MainBinding(),
+      transition: Transition.fadeIn,
+    ),
     // TODO: Add More Pages
   ];
 }
