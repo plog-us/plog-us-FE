@@ -186,13 +186,9 @@ class _MyPageScreenState extends State<MyPageScreen> {
                                 actions: [
                                   TextButton(
                                     onPressed: () {
-                                      // 변경 버튼 눌렀을 때 API 요청 보내기
                                       String newUsername =
                                           usernameController.text;
-                                      // 여기서 API 요청 보내고 응답 처리
-                                      // 이후에 Get.back()을 호출하여 팝업 닫기
-                                      // 예시: _updateUsername(newUsername);
-                                      _updateUsername(newUsername,
+                                      updateUsername(newUsername,
                                           logoutController.userId.value);
                                     },
                                     child: const Text('변경'),
@@ -271,7 +267,9 @@ class _MyPageScreenState extends State<MyPageScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            showChangePasswordPopup(context);
+                          },
                           child: const Text(
                             '비밀번호 변경',
                             style: TextStyle(
@@ -282,6 +280,15 @@ class _MyPageScreenState extends State<MyPageScreen> {
                         ),
                         TextButton(
                           onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                backgroundColor: Color.fromARGB(255, 0, 0, 0),
+                                content: Text(
+                                  "로그아웃되었습니다.",
+                                  style: TextStyle(color: AppColors.white),
+                                ),
+                              ),
+                            );
                             logoutController.setUserId("");
                             Get.toNamed('/login');
                           },
@@ -350,8 +357,121 @@ class _MyPageScreenState extends State<MyPageScreen> {
     setState(() {});
   }
 
-  void _updateUsername(String newUsername, String userId) {
-    print("변경");
+  Future<void> updateUsername(String newUsername, String userId) async {
+    String apiUrl = 'http://35.212.137.41:8080/modify/username/$userId';
+
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+    };
+
+    Map<String, String> body = {
+      'username': newUsername,
+    };
+
+    String jsonBody = json.encode(body);
+
+    try {
+      var response = await http.put(
+        Uri.parse(apiUrl),
+        headers: headers,
+        body: jsonBody,
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Color.fromARGB(255, 0, 0, 0),
+            content: Text(
+              "이름 변경에 성공했습니다.",
+              style: TextStyle(color: AppColors.white),
+            ),
+          ),
+        );
+        setState(() {});
+      } else {
+        print('Failed to update username. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
     Get.back();
+  }
+
+  Future<void> updatePassword(String newPassword, String userId) async {
+    LoginController loginController = Get.find<LoginController>();
+    String apiUrl = 'http://35.212.137.41:8080/modify/password/$userId';
+
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+    };
+
+    Map<String, String> body = {
+      'password': newPassword,
+    };
+
+    String jsonBody = json.encode(body);
+
+    try {
+      var response = await http.put(
+        Uri.parse(apiUrl),
+        headers: headers,
+        body: jsonBody,
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Color.fromARGB(255, 0, 0, 0),
+            content: Text(
+              "비밀번호 변경에 성공했습니다. 다시 로그인해주세요.",
+              style: TextStyle(color: AppColors.white),
+            ),
+          ),
+        );
+
+        setState(() {});
+      } else {
+        print('Failed to update username. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  void showChangePasswordPopup(BuildContext context) {
+    String newPassword = "";
+    LoginController loginController = Get.find<LoginController>();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("비밀번호 변경"),
+          content: TextField(
+            onChanged: (value) {
+              newPassword = value;
+            },
+            decoration: const InputDecoration(hintText: "새 비밀번호 입력"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('취소'),
+            ),
+            TextButton(
+              onPressed: () {
+                updatePassword(newPassword, loginController.userId.value);
+                Navigator.of(context).pop();
+                loginController.setUserId("");
+                Get.toNamed('/login');
+              },
+              child: const Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
