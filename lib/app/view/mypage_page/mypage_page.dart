@@ -46,18 +46,68 @@ class MyPageScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    '닉네임: ${userData['username']}',
-                    style: const TextStyle(fontSize: 22),
+                    '${userData['username']}',
+                    style: const TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    '플로깅 총 점수: ${userData['totalPloggingScore']}',
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '퀴즈 총 점수: ${userData['totalQuizScore']}',
-                    style: const TextStyle(fontSize: 18),
+                  const SizedBox(height: 9),
+                  Container(
+                    margin: const EdgeInsets.all(16), // 여백 지정
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200], // 회색 배경
+                      borderRadius: BorderRadius.circular(10), // 둥근 모서리
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Column(
+                              children: [
+                                const Text(
+                                  'Plogging',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                                Text(
+                                  '${userData['totalPloggingScore']}',
+                                  style: const TextStyle(fontSize: 24),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              width: 80,
+                            ),
+                            Column(
+                              children: [
+                                const Text(
+                                  'Quiz',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                                Text(
+                                  '${userData['totalQuizScore']}',
+                                  style: const TextStyle(fontSize: 24),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                   TextButton(
                     onPressed: () {
