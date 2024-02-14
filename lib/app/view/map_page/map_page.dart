@@ -3,10 +3,39 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:plog_us/app/view/theme/app_colors.dart';
+import 'package:plog_us/app/controllers/login/login_controller.dart';
+
+class Location {
+  final int plogUuid;
+  final String plogAddress;
+  final double plogLatitude;
+  final double plogLongitude;
+  final int plogCount;
+
+  Location({
+    required this.plogUuid,
+    required this.plogAddress,
+    required this.plogLatitude,
+    required this.plogLongitude,
+    required this.plogCount,
+  });
+
+  factory Location.fromJson(Map<String, dynamic> json) {
+    return Location(
+      plogUuid: json['plogUuid'],
+      plogAddress: json['plogAddress'],
+      plogLatitude: json['plogLatitude'],
+      plogLongitude: json['plogLongitude'],
+      plogCount: json['plogCount'],
+    );
+  }
+}
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -20,6 +49,7 @@ class _MapScreenState extends State<MapScreen> {
   StreamSubscription<Position>? positionStreamSubscription;
   Position? currentPosition;
   Set<Marker> markers = {};
+  late List<Location> _locations;
   BitmapDescriptor? customMarkerIcon;
   bool isStreamingPaused = false;
   bool isPloggingStarted = false;
@@ -36,6 +66,7 @@ class _MapScreenState extends State<MapScreen> {
     super.initState();
     _checkLocationPermission();
     _loadCustomMarker();
+    _fetchLocations();
   }
 
   @override
@@ -124,6 +155,21 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
+  Future<void> _fetchLocations() async {
+    final response =
+        await http.get(Uri.parse('http://35.212.137.41:8080/ploglocation'));
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
+      final List<Location> locations =
+          data.map((json) => Location.fromJson(json)).toList();
+      setState(() {
+        _locations = locations;
+      });
+    } else {
+      throw Exception('Failed to load locations');
+    }
+  }
+
   void _showLocationPopup() {
     showDialog(
       context: context,
@@ -132,24 +178,17 @@ class _MapScreenState extends State<MapScreen> {
           title: const Text('플로깅 장소 추천'),
           content: SingleChildScrollView(
             child: ListBody(
-              children: <Widget>[
-                ListTile(
-                  title: const Text('Location 1'),
+              children: _locations.map((location) {
+                return ListTile(
+                  title: Text(location.plogAddress),
                   onTap: () {
                     _toggleStreamSubscription();
-                    _moveToLocation(37.5, 127.0);
+                    _moveToLocation(
+                        location.plogLatitude, location.plogLongitude);
                     Navigator.of(context).pop();
                   },
-                ),
-                ListTile(
-                  title: const Text('Location 2'),
-                  onTap: () {
-                    _toggleStreamSubscription();
-                    _moveToLocation(37.6, 127.1);
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
+                );
+              }).toList(),
             ),
           ),
           actions: <Widget>[
@@ -215,6 +254,8 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    LoginController loginController = Get.find<LoginController>();
+    String userId = loginController.userId.value;
     LatLng currentLatLng = LatLng(
       currentPosition?.latitude ?? 37.54647500000001,
       currentPosition?.longitude ?? 126.9646916,
@@ -224,10 +265,11 @@ class _MapScreenState extends State<MapScreen> {
         title: const Text('Plog Map'),
         backgroundColor: AppColors.cardBackground,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.directions_walk),
-            onPressed: _showLocationPopup,
-          ),
+          if (!isStreamingPaused)
+            IconButton(
+              icon: const Icon(Icons.directions_walk),
+              onPressed: _showLocationPopup,
+            ),
           IconButton(
             icon: const Icon(Icons.camera_alt),
             onPressed: () {
