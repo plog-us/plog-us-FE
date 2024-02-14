@@ -52,7 +52,8 @@ class _MapScreenState extends State<MapScreen> {
   late List<Location> _locations;
   BitmapDescriptor? customMarkerIcon;
   String locationName = "";
-  int? locationUuid;
+  String plogUuid = "";
+  String ploggingUuid = "";
   bool isStreamingPaused = false;
   bool isPloggingStarted = false;
   // ignore: prefer_final_fields
@@ -202,7 +203,7 @@ class _MapScreenState extends State<MapScreen> {
 
                     setState(() {
                       locationName = location.plogAddress;
-                      locationUuid = location.plogUuid;
+                      plogUuid = location.plogUuid.toString();
                     });
                     Navigator.of(context).pop();
                   },
@@ -229,7 +230,7 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  void _startPlogging(int locationUuid, String userId) {
+  void _startPlogging(String startUuid, String userId) {
     if (isStreamingPaused) {
       _toggleStreamSubscription();
     }
@@ -237,23 +238,30 @@ class _MapScreenState extends State<MapScreen> {
       setState(() {
         isPloggingStarted = true;
       });
+      _postStartPlog(startUuid, userId);
       _stopwatch.start();
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         setState(() {});
       });
     } else {
-      _stopPlogging(locationUuid, userId);
+      _stopPlogging(ploggingUuid);
     }
   }
 
-  Future<void> _postStartPlog(int locationUuid, String userId) async {
+  Future<void> _postStartPlog(String plogUuid, String userUuid) async {
     String apiUrl =
-        'http://35.212.137.41:8080/startplogging/$userId/$locationUuid';
+        'http://35.212.137.41:8080/startplogging/$userUuid/$plogUuid';
 
     try {
+      print(apiUrl);
       var response = await http.post(Uri.parse(apiUrl));
 
       if (response.statusCode == 200) {
+        var responseData = json.decode(response.body);
+        print(responseData);
+        setState(() {
+          ploggingUuid = responseData.toString();
+        });
         print("플로깅 시작 성공!");
       } else {
         print('플로깅 시작 실패: ${response.statusCode}');
@@ -263,7 +271,32 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-  void _stopPlogging(int locationUuid, String userId) {
+  Future<void> _postStopPlog(String ploggingUuid) async {
+    String apiUrl = 'http://35.212.137.41:8080/finishplogging/$ploggingUuid';
+
+    Map<String, String> requestData = {'ploggingDistance': '1.3'};
+
+    try {
+      var response = await http.put(
+        Uri.parse(apiUrl),
+        body: jsonEncode(requestData),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print("플로깅이 종료되었습니다!");
+      } else {
+        print('플로깅 종료 실패: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('종료 중 오류 발생: $e');
+    }
+  }
+
+  void _stopPlogging(String finshUuid) {
+    _postStopPlog(finshUuid);
     setState(() {
       isPloggingStarted = false;
       locationName = "";
@@ -376,19 +409,7 @@ class _MapScreenState extends State<MapScreen> {
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
                 onPressed: () {
-                  if (locationUuid != null) {
-                    _startPlogging(locationUuid!, userId);
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        backgroundColor: AppColors.black,
-                        content: Text(
-                          "플로깅 추천을 이용해주세요!",
-                          style: TextStyle(color: AppColors.white),
-                        ),
-                      ),
-                    );
-                  }
+                  _startPlogging(plogUuid, userId);
                 },
                 style: ButtonStyle(
                   minimumSize:
