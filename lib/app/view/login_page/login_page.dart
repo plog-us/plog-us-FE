@@ -194,7 +194,14 @@ class _LoginScreenState extends State<LoginScreen> {
     if (response.statusCode == 200) {
       print('로그인 성공! 아이디: $email, 비밀번호: $password');
 
+      if (response.body.isEmpty) {
+        _loginfailed();
+        _clearTextFields();
+        return;
+      }
+
       var responseData = json.decode(response.body);
+
       String userId = responseData['userUuid'].toString();
       _loginController.setUserId(userId);
       Get.toNamed('/main');
@@ -210,25 +217,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       print('POST request failed with status: ${response.statusCode}');
       print('Response body: ${response.body}');
-      print('가입 실패: ${response.reasonPhrase}');
-
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('가입 실패'),
-            content: Text('서버 에러: ${response.reasonPhrase}'),
-            actions: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('확인'),
-              ),
-            ],
-          );
-        },
-      );
+      _loginfailed();
     }
   }
 
@@ -242,5 +231,22 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  void _loginfailed() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        backgroundColor: Color.fromARGB(255, 0, 0, 0),
+        content: Text(
+          "로그인에 실패했습니다.",
+          style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+        ),
+      ),
+    );
+  }
+
+  void _clearTextFields() {
+    emailController.text = "";
+    passwordController.text = "";
   }
 }
