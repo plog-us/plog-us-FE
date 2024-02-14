@@ -51,6 +51,8 @@ class _MapScreenState extends State<MapScreen> {
   Set<Marker> markers = {};
   late List<Location> _locations;
   BitmapDescriptor? customMarkerIcon;
+  String locationName = "";
+  int? locationUuid;
   bool isStreamingPaused = false;
   bool isPloggingStarted = false;
   // ignore: prefer_final_fields
@@ -137,7 +139,7 @@ class _MapScreenState extends State<MapScreen> {
               currentPosition!.latitude,
               currentPosition!.longitude,
             ),
-            infoWindow: const InfoWindow(title: 'Current Location'),
+            infoWindow: const InfoWindow(title: '내 위치'),
             icon: customMarkerIcon!,
           ),
         };
@@ -175,7 +177,7 @@ class _MapScreenState extends State<MapScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('플로깅 장소 추천'),
+          title: const Text('플로깅 장소 고르기'),
           content: SingleChildScrollView(
             child: ListBody(
               children: _locations.map((location) {
@@ -185,6 +187,23 @@ class _MapScreenState extends State<MapScreen> {
                     _toggleStreamSubscription();
                     _moveToLocation(
                         location.plogLatitude, location.plogLongitude);
+
+                    setState(() {
+                      markers.add(
+                        Marker(
+                          markerId: MarkerId(location.plogUuid.toString()),
+                          position: LatLng(
+                              location.plogLatitude, location.plogLongitude),
+                          infoWindow: InfoWindow(title: location.plogAddress),
+                          icon: customMarkerIcon!,
+                        ),
+                      );
+                    });
+
+                    setState(() {
+                      locationName = location.plogAddress;
+                      locationUuid = location.plogUuid;
+                    });
                     Navigator.of(context).pop();
                   },
                 );
@@ -210,7 +229,10 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  void _startPlogging() {
+  void _startPlogging(int locationUuid, String userId) {
+    if (isStreamingPaused) {
+      _toggleStreamSubscription();
+    }
     if (!isPloggingStarted) {
       setState(() {
         isPloggingStarted = true;
@@ -220,16 +242,34 @@ class _MapScreenState extends State<MapScreen> {
         setState(() {});
       });
     } else {
-      _stopPlogging();
+      _stopPlogging(locationUuid, userId);
     }
   }
 
-  void _stopPlogging() {
+  Future<void> _postStartPlog(int locationUuid, String userId) async {
+    String apiUrl =
+        'http://35.212.137.41:8080/startplogging/$userId/$locationUuid';
+
+    try {
+      var response = await http.post(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        print("플로깅 시작 성공!");
+      } else {
+        print('플로깅 시작 실패: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('시작 중 오류 발생: $e');
+    }
+  }
+
+  void _stopPlogging(int locationUuid, String userId) {
     setState(() {
       isPloggingStarted = false;
+      locationName = "";
+      _stopwatch.stop();
+      _timer?.cancel();
     });
-    _stopwatch.stop();
-    _timer?.cancel();
 
     showDialog(
       context: context,
@@ -295,7 +335,7 @@ class _MapScreenState extends State<MapScreen> {
               Circle(
                 circleId: const CircleId('circle'),
                 center: currentLatLng,
-                radius: 120,
+                radius: 50,
                 fillColor: Colors.blue.withOpacity(0.2),
                 strokeColor: Colors.blue,
                 strokeWidth: 2,
@@ -335,7 +375,21 @@ class _MapScreenState extends State<MapScreen> {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
-                onPressed: _startPlogging,
+                onPressed: () {
+                  if (locationUuid != null) {
+                    _startPlogging(locationUuid!, userId);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        backgroundColor: AppColors.black,
+                        content: Text(
+                          "플로깅 추천을 이용해주세요!",
+                          style: TextStyle(color: AppColors.white),
+                        ),
+                      ),
+                    );
+                  }
+                },
                 style: ButtonStyle(
                   minimumSize:
                       MaterialStateProperty.all(const Size(100.0, 56.0)),
@@ -344,7 +398,11 @@ class _MapScreenState extends State<MapScreen> {
                       : MaterialStateProperty.all(AppColors.greenOrigin),
                 ),
                 child: Text(
-                  isPloggingStarted ? '플로깅 종료' : '플로깅 시작',
+                  isPloggingStarted
+                      ? '플로깅 종료'
+                      : (locationName != ""
+                          ? '$locationName에서 플로깅 시작하기'
+                          : "플로깅 시작하기"),
                   style: TextStyle(
                     fontSize: 18.0,
                     color:

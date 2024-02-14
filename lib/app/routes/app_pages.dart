@@ -27,12 +27,6 @@ class AppPages {
       transition: Transition.fadeIn,
     ),
     GetPage(
-      name: _Paths.SETTING,
-      page: () => const SettingPage(),
-      binding: MainBinding(),
-      transition: Transition.downToUp,
-    ),
-    GetPage(
       name: _Paths.JOIN,
       page: () => const SignUpScreen(),
       binding: MainBinding(),

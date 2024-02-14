@@ -33,15 +33,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
   Future<void> _uploadImage(String userUuid) async {
     String apiUrl = 'http://35.212.137.41:8080/editprofile/$userUuid';
     if (_imageFile == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Color.fromARGB(255, 0, 0, 0),
-          content: Text(
-            "이미지를 선택하세요",
-            style: TextStyle(color: AppColors.white),
-          ),
-        ),
-      );
+      showBlackPopup("갤러리에서 이미지를 선택하세요");
       return;
     }
 
@@ -93,14 +85,6 @@ class _MyPageScreenState extends State<MyPageScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('마이페이지'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              Get.toNamed('/setting'); // 이동할 스크린 경로 지정
-            },
-          ),
-        ],
       ),
       body: Center(
         child: FutureBuilder(
@@ -280,15 +264,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                backgroundColor: Color.fromARGB(255, 0, 0, 0),
-                                content: Text(
-                                  "로그아웃되었습니다.",
-                                  style: TextStyle(color: AppColors.white),
-                                ),
-                              ),
-                            );
+                            showBlackPopup("로그아웃되었습니다.");
                             logoutController.setUserId("");
                             Get.toNamed('/login');
                           },
@@ -342,15 +318,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
   }
 
   void _profiledelete() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        backgroundColor: Color.fromARGB(255, 0, 0, 0),
-        content: Text(
-          "프로필 이미지가 삭제되었습니다.",
-          style: TextStyle(color: AppColors.white),
-        ),
-      ),
-    );
+    showBlackPopup("프로필 이미지가 삭제되었습니다.");
     setState(() {
       _imageFile = null;
     });
@@ -378,15 +346,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
       );
 
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: Color.fromARGB(255, 0, 0, 0),
-            content: Text(
-              "이름 변경에 성공했습니다.",
-              style: TextStyle(color: AppColors.white),
-            ),
-          ),
-        );
+        showBlackPopup("이름 변경에 성공했습니다.");
         setState(() {});
       } else {
         print('Failed to update username. Status code: ${response.statusCode}');
@@ -419,16 +379,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
       );
 
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: Color.fromARGB(255, 0, 0, 0),
-            content: Text(
-              "비밀번호 변경에 성공했습니다. 다시 로그인해주세요.",
-              style: TextStyle(color: AppColors.white),
-            ),
-          ),
-        );
-
+        showBlackPopup("비밀번호 변경에 성공했습니다. 다시 로그인해주세요.");
         setState(() {});
       } else {
         print('Failed to update username. Status code: ${response.statusCode}');
@@ -436,6 +387,18 @@ class _MyPageScreenState extends State<MyPageScreen> {
     } catch (e) {
       print('Error: $e');
     }
+  }
+
+  void showBlackPopup(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+        content: Text(
+          message,
+          style: const TextStyle(color: AppColors.white),
+        ),
+      ),
+    );
   }
 
   void showChangePasswordPopup(BuildContext context) {
