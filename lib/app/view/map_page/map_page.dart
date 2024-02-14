@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -14,8 +16,10 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   late GoogleMapController mapController;
+  StreamSubscription<Position>? positionStreamSubscription;
   Position? currentPosition;
   Set<Marker> markers = {};
+  BitmapDescriptor? customMarkerIcon;
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -25,14 +29,32 @@ class _MapScreenState extends State<MapScreen> {
   void initState() {
     super.initState();
     _checkLocationPermission();
+    _loadCustomMarker();
+  }
+
+  @override
+  void dispose() {
+    positionStreamSubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _checkLocationPermission() async {
     if (await Permission.location.isGranted) {
       _getCurrentLocation();
+      _startLocationUpdates();
     } else {
       await Permission.location.request();
     }
+  }
+
+  void _startLocationUpdates() {
+    positionStreamSubscription =
+        Geolocator.getPositionStream().listen((Position position) {
+      setState(() {
+        currentPosition = position;
+        _updateCameraPosition();
+      });
+    });
   }
 
   void _getCurrentLocation() async {
@@ -65,10 +87,21 @@ class _MapScreenState extends State<MapScreen> {
               currentPosition!.longitude,
             ),
             infoWindow: const InfoWindow(title: 'Current Location'),
+            icon: customMarkerIcon!,
           ),
         };
       });
     }
+  }
+
+  Future<void> _loadCustomMarker() async {
+    final ByteData byteData =
+        await rootBundle.load('assets/images/location.png');
+    final Uint8List byteList = byteData.buffer.asUint8List();
+    customMarkerIcon = BitmapDescriptor.fromBytes(
+      byteList,
+      size: const Size(20, 20),
+    );
   }
 
   @override
