@@ -44,6 +44,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       _allFieldsFilled = _nameController.text.isNotEmpty &&
           _emailController.text.isNotEmpty &&
           _passwordController.text.isNotEmpty;
+      print('모든 필드가${_allFieldsFilled.toString()}');
     });
   }
 
@@ -148,7 +149,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(height: 20.0),
               GestureDetector(
                 onTap: () {
-                  _allFieldsFilled ? _signUp : _notfilled();
+                  _allFieldsFilled ? _signUp(context) : _notfilled();
                 },
                 child: Container(
                   width: double.infinity,
@@ -176,7 +177,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Future<void> _signUp() async {
+  Future<void> _signUp(BuildContext context) async {
     String name = _nameController.text.trim();
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
@@ -189,37 +190,50 @@ class _SignUpScreenState extends State<SignUpScreen> {
       'email': email,
     };
 
-    final response = await http.post(
-      Uri.parse(url),
-      headers: {"content-type": "application/json"},
-      body: jsonEncode(body),
-    );
-
-    if (response.statusCode == 200) {
-      print('가입 성공! 아이디: $email, 비밀번호: $password');
-
-      var responseData = json.decode(response.body);
-      String userId = responseData['email'];
-      Get.toNamed('/login');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Color.fromARGB(255, 161, 229, 161),
-          content: Text(
-            "회원가입에 성공했습니다.",
-            style: TextStyle(color: AppColors.black),
-          ),
-        ),
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"content-type": "application/json"},
+        body: jsonEncode(body),
       );
-    } else {
-      print('POST request failed with status: ${response.statusCode}');
-      print('Response body: ${response.body}');
 
+      if (response.statusCode == 200) {
+        print('가입 성공! 아이디: $email, 비밀번호: $password');
+
+        var responseData = json.decode(response.body);
+        String userId = responseData['email'];
+        Navigator.of(context).pushNamed('/login');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Color.fromARGB(255, 161, 229, 161),
+            content: Text(
+              "회원가입에 성공했습니다.",
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        );
+      } else {
+        print('POST request failed with status: ${response.statusCode}');
+        print('Response body: ${response.body}');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.black,
+            content: Text(
+              "회원가입에 실패했습니다",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        );
+      }
+    } catch (error) {
+      print('Error: $error');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          backgroundColor: AppColors.black,
+          backgroundColor: Colors.red,
           content: Text(
-            "회원가입에 실패했습니다",
-            style: TextStyle(color: AppColors.white),
+            "오류가 발생했습니다. 다시 시도해주세요.",
+            style: TextStyle(color: Colors.white),
           ),
         ),
       );
