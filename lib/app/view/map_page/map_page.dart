@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:plog_us/app/view/theme/app_colors.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -20,6 +21,11 @@ class _MapScreenState extends State<MapScreen> {
   Position? currentPosition;
   Set<Marker> markers = {};
   BitmapDescriptor? customMarkerIcon;
+  bool isStreamingPaused = false;
+  bool isPloggingStarted = false;
+  // ignore: prefer_final_fields
+  Stopwatch _stopwatch = Stopwatch();
+  Timer? _timer;
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -35,6 +41,8 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void dispose() {
     positionStreamSubscription?.cancel();
+    _stopwatch.stop();
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -55,6 +63,18 @@ class _MapScreenState extends State<MapScreen> {
         _updateCameraPosition();
       });
     });
+  }
+
+  void _toggleStreamSubscription() {
+    setState(() {
+      isStreamingPaused = !isStreamingPaused;
+    });
+
+    if (isStreamingPaused) {
+      positionStreamSubscription?.pause();
+    } else {
+      positionStreamSubscription?.resume();
+    }
   }
 
   void _getCurrentLocation() async {
@@ -104,6 +124,95 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
+  void _showLocationPopup() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('플로깅 장소 추천'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                ListTile(
+                  title: const Text('Location 1'),
+                  onTap: () {
+                    _toggleStreamSubscription();
+                    _moveToLocation(37.5, 127.0);
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ListTile(
+                  title: const Text('Location 2'),
+                  onTap: () {
+                    _toggleStreamSubscription();
+                    _moveToLocation(37.6, 127.1);
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _moveToLocation(double latitude, double longitude) {
+    mapController.animateCamera(
+      CameraUpdate.newLatLng(LatLng(latitude, longitude)),
+    );
+  }
+
+  void _startPlogging() {
+    if (!isPloggingStarted) {
+      setState(() {
+        isPloggingStarted = true;
+      });
+      _stopwatch.start();
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        setState(() {});
+      });
+    } else {
+      _stopPlogging();
+    }
+  }
+
+  void _stopPlogging() {
+    setState(() {
+      isPloggingStarted = false;
+    });
+    _stopwatch.stop();
+    _timer?.cancel();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('플로깅 종료'),
+          content: Text(
+            '플로깅 시간: ${_stopwatch.elapsed.inMinutes.toString().padLeft(2, '0')}:${(_stopwatch.elapsed.inSeconds % 60).toString().padLeft(2, '0')}',
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     LatLng currentLatLng = LatLng(
@@ -113,14 +222,23 @@ class _MapScreenState extends State<MapScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Plog Map'),
-        backgroundColor: const Color.fromARGB(255, 143, 169, 144),
+        backgroundColor: AppColors.cardBackground,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.directions_walk),
+            onPressed: _showLocationPopup,
+          ),
           IconButton(
             icon: const Icon(Icons.camera_alt),
             onPressed: () {
-              print('Camera icon pressed!');
+              print('카메라인식페이지로 이동');
             },
           ),
+          if (isStreamingPaused)
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: _toggleStreamSubscription,
+            ),
         ],
       ),
       body: Stack(
@@ -144,24 +262,51 @@ class _MapScreenState extends State<MapScreen> {
             markers: markers,
           ),
           Positioned(
+            top: 16,
+            left: 16,
+            child: isPloggingStarted
+                ? Column(
+                    children: [
+                      const Text(
+                        "플로깅 중입니다",
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 0, 0, 0),
+                          fontSize: 15,
+                        ),
+                      ),
+                      Text(
+                        ' ${_stopwatch.elapsed.inMinutes.toString().padLeft(2, '0')}:${(_stopwatch.elapsed.inSeconds % 60).toString().padLeft(2, '0')}',
+                        style: const TextStyle(
+                          color: Color.fromARGB(255, 0, 0, 0),
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  )
+                : Container(),
+          ),
+          Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
-                onPressed: () {
-                  print('플로깅이 시작되었습니다!');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  minimumSize: const Size.fromHeight(56.0), // Set button height
+                onPressed: _startPlogging,
+                style: ButtonStyle(
+                  minimumSize:
+                      MaterialStateProperty.all(const Size(100.0, 56.0)),
+                  backgroundColor: isPloggingStarted
+                      ? MaterialStateProperty.all(AppColors.redOrigin)
+                      : MaterialStateProperty.all(AppColors.greenOrigin),
                 ),
-                child: const Text(
-                  '플로깅 시작',
+                child: Text(
+                  isPloggingStarted ? '플로깅 종료' : '플로깅 시작',
                   style: TextStyle(
                     fontSize: 18.0,
-                    color: Colors.red,
+                    color:
+                        isPloggingStarted ? AppColors.white : AppColors.black,
                   ),
                 ),
               ),
