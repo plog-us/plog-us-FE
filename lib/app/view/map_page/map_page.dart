@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:plog_us/app/view/map_page/finish_page.dart';
 import 'package:plog_us/app/view/theme/app_colors.dart';
 import 'package:plog_us/app/controllers/login/login_controller.dart';
 
@@ -111,6 +112,7 @@ class _MapScreenState extends State<MapScreen> {
     positionStreamSubscription?.cancel();
     _stopwatch.stop();
     _timer?.cancel();
+    mapController.dispose();
     super.dispose();
   }
 
@@ -342,32 +344,26 @@ class _MapScreenState extends State<MapScreen> {
 
   void _stopPlogging(String finshUuid) {
     _postStopPlog(finshUuid);
+    String location = locationName;
+    print(locationName);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FinishScreen(
+          locationName: location,
+          stopwatch: _stopwatch,
+          timer: _timer!,
+        ),
+      ),
+    );
+
     setState(() {
       isPloggingStarted = false;
       locationName = "";
       _stopwatch.stop();
       _timer?.cancel();
     });
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('플로깅 종료'),
-          content: Text(
-            '플로깅 시간: ${_stopwatch.elapsed.inMinutes.toString().padLeft(2, '0')}:${(_stopwatch.elapsed.inSeconds % 60).toString().padLeft(2, '0')}',
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('확인'),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override

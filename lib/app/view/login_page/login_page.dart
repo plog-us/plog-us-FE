@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -16,11 +17,11 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final LoginController _loginController = Get.put(LoginController());
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn googleSignIn = GoogleSignIn();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool _allFieldsFilled = false;
-
-  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 
   @override
   void initState() {
@@ -102,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 32.0),
                 GestureDetector(
                   onTap: () {
-                    _allFieldsFilled ? _Login() : _notfilled();
+                    _allFieldsFilled ? _login() : _notfilled();
                   },
                   child: Container(
                     width: double.infinity,
@@ -121,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16.0),
                 GestureDetector(
-                  onTap: _handleGoogleSignIn, // _login 함수를 실행하도록 설정
+                  onTap: signInWithGoogle,
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.black26),
@@ -162,19 +163,35 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _handleGoogleSignIn() async {
+  Future<void> signInWithGoogle() async {
+    print('구글로그인중');
     try {
-      GoogleSignInAccount? account = await _googleSignIn.signIn();
-      if (account != null) {
-        print(
-            'Google 로그인 성공: ${account.displayName}, ${account.email}, ${account.photoUrl}');
+      final GoogleSignInAccount? googleSignInAccount =
+          await googleSignIn.signIn();
+      if (googleSignInAccount != null) {
+        final GoogleSignInAuthentication googleSignInAuthentication =
+            await googleSignInAccount.authentication;
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleSignInAuthentication.accessToken,
+          idToken: googleSignInAuthentication.idToken,
+        );
+        final UserCredential authResult =
+            await _auth.signInWithCredential(credential);
+        final User? user = authResult.user;
+
+        if (user != null) {
+          print(
+              'Google 로그인 성공: ${user.displayName}, ${user.email}, ${user.photoURL}');
+        } else {
+          print('Google 로그인 실패: 사용자 정보를 가져올 수 없음');
+        }
       }
     } catch (error) {
       print('Google 로그인 실패: $error');
     }
   }
 
-  Future<void> _Login() async {
+  Future<void> _login() async {
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
 
