@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:decimal/decimal.dart';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -37,6 +39,36 @@ class Location {
   }
 }
 
+class Distance {
+  final double latitude;
+  final double longitude;
+
+  Distance(this.latitude, this.longitude);
+}
+
+double calculateDistance(Distance location1, Distance location2) {
+  const double earthRadius = 6371;
+
+  double lat1Rad = degreesToRadians(location1.latitude);
+  double lon1Rad = degreesToRadians(location1.longitude);
+  double lat2Rad = degreesToRadians(location2.latitude);
+  double lon2Rad = degreesToRadians(location2.longitude);
+
+  double latDiff = lat2Rad - lat1Rad;
+  double lonDiff = lon2Rad - lon1Rad;
+
+  double a = pow(sin(latDiff / 2), 2) +
+      cos(lat1Rad) * cos(lat2Rad) * pow(sin(lonDiff / 2), 2);
+  double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+  double distance = earthRadius * c;
+
+  return distance;
+}
+
+double degreesToRadians(double degrees) {
+  return degrees * pi / 180;
+}
+
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
 
@@ -54,6 +86,8 @@ class _MapScreenState extends State<MapScreen> {
   String locationName = "";
   String plogUuid = "";
   String ploggingUuid = "";
+  int? plogIdx;
+  String plogdistance = "";
   bool isStreamingPaused = false;
   bool isPloggingStarted = false;
   // ignore: prefer_final_fields
@@ -181,7 +215,9 @@ class _MapScreenState extends State<MapScreen> {
           title: const Text('플로깅 장소 고르기'),
           content: SingleChildScrollView(
             child: ListBody(
-              children: _locations.map((location) {
+              children: _locations.asMap().entries.map((entry) {
+                final int index = entry.key;
+                final location = entry.value;
                 return ListTile(
                   title: Text(location.plogAddress),
                   onTap: () {
@@ -204,6 +240,7 @@ class _MapScreenState extends State<MapScreen> {
                     setState(() {
                       locationName = location.plogAddress;
                       plogUuid = location.plogUuid.toString();
+                      plogIdx = index;
                     });
                     Navigator.of(context).pop();
                   },
@@ -241,7 +278,16 @@ class _MapScreenState extends State<MapScreen> {
       _postStartPlog(startUuid, userId);
       _stopwatch.start();
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        setState(() {});
+        double distance = calculateDistance(
+            Distance(_locations[plogIdx!].plogLatitude,
+                _locations[plogIdx!].plogLongitude),
+            Distance(currentPosition!.latitude, currentPosition!.longitude));
+        setState(() {
+          Decimal plogDistanceDecimal =
+              Decimal.parse(distance.toStringAsFixed(1));
+          String plogDistanceString = plogDistanceDecimal.toString();
+          print('현재 위치와 선택한 플로깅 위치 간의 거리: $plogdistance 킬로미터');
+        });
       });
     } else {
       _stopPlogging(ploggingUuid);
@@ -273,16 +319,15 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<void> _postStopPlog(String ploggingUuid) async {
     String apiUrl = 'http://35.212.137.41:8080/finishplogging/$ploggingUuid';
+    String finaldistance = plogdistance.toString();
 
-    Map<String, String> requestData = {'ploggingDistance': '1.3'};
+    Map<String, dynamic> requestData = {'ploggingDistance': finaldistance};
 
     try {
-      var response = await http.put(
+      final response = await http.put(
         Uri.parse(apiUrl),
+        headers: {"content-type": "application/json"},
         body: jsonEncode(requestData),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
       );
 
       if (response.statusCode == 200) {
@@ -409,7 +454,19 @@ class _MapScreenState extends State<MapScreen> {
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
                 onPressed: () {
-                  _startPlogging(plogUuid, userId);
+                  if (locationName != "") {
+                    _startPlogging(plogUuid, userId);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        backgroundColor: Color.fromARGB(255, 0, 0, 0),
+                        content: Text(
+                          "업데이트 전입니다. 플로깅 추천 경로를 이용하세요",
+                          style: TextStyle(color: AppColors.white),
+                        ),
+                      ),
+                    );
+                  }
                 },
                 style: ButtonStyle(
                   minimumSize:
