@@ -354,6 +354,7 @@ class _MapScreenState extends State<MapScreen> {
           locationName: location,
           stopwatch: _stopwatch,
           timer: _timer!,
+          finalUuid: _locations[plogIdx!].plogUuid.toString(),
         ),
       ),
     );
