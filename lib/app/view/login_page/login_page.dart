@@ -45,15 +45,16 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  Future _fetchUserData() async {
-    String userId = _loginController.userId.string;
-
+  Future _fetchUserData(String userId) async {
     String apiUrl = 'http://35.212.137.41:8080/user/$userId';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        Map<String, dynamic> userData = json.decode(response.body);
+        String username = userData['username'];
+        _loginController.setUserName(username);
+        print('Received username: $username');
       } else {
         throw Exception('Failed to load user data');
       }
@@ -227,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (response.statusCode == 200) {
       print('로그인 성공! 아이디: $email, 비밀번호: $password');
-      _fetchUserData();
+
       if (response.body.isEmpty) {
         _loginfailed();
         _clearTextFields();
@@ -238,6 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       String userId = responseData['userUuid'].toString();
       _loginController.setUserId(userId);
+      _fetchUserData(userId);
       Get.toNamed('/main');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

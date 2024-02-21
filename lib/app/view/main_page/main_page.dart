@@ -15,7 +15,8 @@ import '../../controllers/main/main_controller.dart';
 
 class MainPage extends BaseView<MainController> {
   MainPage({super.key});
-  String username = "user";
+  String username_example = "user";
+  final LoginController _loginController = Get.put(LoginController());
 
   @override
   PreferredSizeWidget? appBar(BuildContext context) {
@@ -39,7 +40,7 @@ class MainPage extends BaseView<MainController> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        '$username 님 환영합니다!',
+                        '${_loginController.username} 님 환영합니다!',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
