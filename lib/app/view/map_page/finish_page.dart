@@ -25,6 +25,7 @@ class FinishScreen extends StatefulWidget {
 }
 
 class _FinishScreenState extends State<FinishScreen> {
+  String plogwastebin = "";
   @override
   void initState() {
     super.initState();
@@ -39,9 +40,17 @@ class _FinishScreenState extends State<FinishScreen> {
       var response = await http.get(Uri.parse(apiUrl));
 
       if (response.statusCode == 200) {
-        var responseData = json.decode(response.body);
-        print(responseData);
-        //uf8 디코딩 하기
+        var responseData = utf8.decode(response.bodyBytes); // UTF-8 디코딩
+        var jsonData = json.decode(responseData);
+        print(jsonData);
+
+        List<dynamic> wastebins = json.decode(responseData);
+        setState(() {
+          String wastebin =
+              wastebins.isNotEmpty ? wastebins[0]['binAddress'] : '';
+          plogwastebin = wastebin;
+          print('Wastebin: $wastebin');
+        });
       } else {
         print('배출함 찾기 실패: ${response.statusCode}');
       }
@@ -90,7 +99,7 @@ class _FinishScreenState extends State<FinishScreen> {
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: Text(
-                '배출함 위치: ${widget.finalUuid}',
+                '배출함 위치: $plogwastebin',
                 style: const TextStyle(
                   fontSize: 20,
                 ),

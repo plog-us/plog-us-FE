@@ -45,6 +45,23 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+  Future _fetchUserData() async {
+    String userId = _loginController.userId.string;
+
+    String apiUrl = 'http://35.212.137.41:8080/user/$userId';
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        throw Exception('Failed to load user data');
+      }
+    } catch (error) {
+      throw Exception('Error: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -210,7 +227,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (response.statusCode == 200) {
       print('로그인 성공! 아이디: $email, 비밀번호: $password');
-
+      _fetchUserData();
       if (response.body.isEmpty) {
         _loginfailed();
         _clearTextFields();

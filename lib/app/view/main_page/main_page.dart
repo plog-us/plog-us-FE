@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:plog_us/app/core/base/base_view.dart';
 import 'package:plog_us/app/view/login_page/login_page.dart';
 import 'package:plog_us/app/view/map_page/map_page.dart';
@@ -6,10 +10,12 @@ import 'package:plog_us/app/view/mypage_page/mypage_page.dart';
 import 'package:plog_us/app/view/signup_page/signup_page.dart';
 import 'package:plog_us/app/view/theme/app_colors.dart';
 
+import 'package:plog_us/app/controllers/login/login_controller.dart';
 import '../../controllers/main/main_controller.dart';
 
 class MainPage extends BaseView<MainController> {
   MainPage({super.key});
+  String username = "user";
 
   @override
   PreferredSizeWidget? appBar(BuildContext context) {
@@ -26,28 +32,32 @@ class MainPage extends BaseView<MainController> {
           Column(
             children: [
               Container(
-                height: 150, // 유저 정보를 보여주는 컨테이너의 높이
-                color: Colors.grey[200], // 컨테이너의 배경색
-                child: const Center(
+                height: 150,
+                color: Colors.grey[200],
+                child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'User 님 환영합니다!', // 여기에 유저 이름을 표시
-                        style: TextStyle(
-                          fontSize: 24, // 유저 이름의 폰트 크기
-                          fontWeight: FontWeight.bold, // 유저 이름의 폰트 두께
+                        '$username 님 환영합니다!',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 15,
                       ),
-                      Text(
-                        '마이페이지 바로가기', // 여기에 유저 이름을 표시
-                        style: TextStyle(
-                          fontSize: 18, // 유저 이름의 폰트 크기
-                          // 유저 이름의 폰트 두께
-                        ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const MyPageScreen()),
+                          );
+                        },
+                        child: const Text('마이페이지 바로가기',
+                            style: TextStyle(fontSize: 18)),
                       ),
                     ],
                   ),
