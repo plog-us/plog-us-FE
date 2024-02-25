@@ -48,9 +48,9 @@ The plogging quizzes, which come with different themes every day, allow users to
     - Compute Engine
     - Cloud Storage
     - VPC network
-    - Docker    
     - SQL (MySQL)
     - Google Maps Platform
+- Docker    
 
 ### Front-end
 - Flutter
