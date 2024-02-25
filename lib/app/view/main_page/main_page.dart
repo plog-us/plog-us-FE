@@ -168,7 +168,7 @@ class MainPage extends BaseView<MainController> {
                         ),
                       ),
                     ),
-                    TextButton.icon(
+                    TextButton(
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -176,17 +176,6 @@ class MainPage extends BaseView<MainController> {
                               builder: (context) => const LeaderboardScreen()),
                         );
                       },
-                      icon: const Icon(
-                        Icons.golf_course_rounded,
-                        color: AppColors.black,
-                      ),
-                      label: const Text(
-                        'Leaderboard',
-                        style: TextStyle(
-                          fontSize: 22,
-                          color: AppColors.black,
-                        ),
-                      ),
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all<Color>(
                             AppColors.greenOrigin),
@@ -194,6 +183,30 @@ class MainPage extends BaseView<MainController> {
                             MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      ),
+                      child: FittedBox(
+                        fit: BoxFit.fitWidth,
+                        child: RichText(
+                          textAlign: TextAlign.center,
+                          text: const TextSpan(
+                            children: [
+                              WidgetSpan(
+                                alignment: PlaceholderAlignment.middle,
+                                child: Icon(
+                                  Icons.golf_course_rounded,
+                                  color: AppColors.black,
+                                ),
+                              ),
+                              TextSpan(
+                                text: "Leaderboard",
+                                style: TextStyle(
+                                    fontSize: 22,
+                                    color: AppColors.black,
+                                    textBaseline: TextBaseline.alphabetic),
+                              ),
+                            ],
                           ),
                         ),
                       ),
