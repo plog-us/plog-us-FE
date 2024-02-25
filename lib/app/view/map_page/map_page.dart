@@ -11,6 +11,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:plog_us/app/view/map_page/finish_page.dart';
+import 'package:plog_us/app/view/plog_log_page/plog_log_page.dart';
 import 'package:plog_us/app/view/theme/app_colors.dart';
 import 'package:plog_us/app/controllers/login/login_controller.dart';
 
@@ -386,9 +387,14 @@ class _MapScreenState extends State<MapScreen> {
               onPressed: _showLocationPopup,
             ),
           IconButton(
-            icon: const Icon(Icons.camera_alt),
+            icon: const Icon(Icons.history),
             onPressed: () {
-              print('카메라인식페이지로 이동');
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PlogLogScreen(),
+                ),
+              );
             },
           ),
           if (isStreamingPaused)
