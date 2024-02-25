@@ -1,5 +1,7 @@
 
-![github_readme](https://github.com/plog-us/plog-us-FE/assets/70904075/1cc141c4-de77-469f-a0b6-70bfba159a58)
+![github_plogus](https://github.com/plog-us/plog-us-FE/assets/70904075/4f1a448b-06a7-4d2e-8f68-c6cbad06ccab)
+
+
 
 
 # **💬 Introduction**
@@ -46,6 +48,7 @@ The plogging quizzes, which come with different themes every day, allow users to
     - Compute Engine
     - Cloud Storage
     - VPC network
+    - Docker    
     - SQL (MySQL)
     - Google Maps Platform
 
@@ -54,7 +57,6 @@ The plogging quizzes, which come with different themes every day, allow users to
     - GetX
 
 ### ML
-- Docker
 - Tensorflow
 - Keras
 - Colab
