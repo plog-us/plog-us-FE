@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:plog_us/app/core/base/base_view.dart';
+import 'package:plog_us/app/view/classify_page/classify_page.dart';
 import 'package:plog_us/app/view/login_page/login_page.dart';
 import 'package:plog_us/app/view/map_page/map_page.dart';
 import 'package:plog_us/app/view/mypage_page/mypage_page.dart';
@@ -80,7 +81,7 @@ class MainPage extends BaseView<MainController> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const MyPageScreen()),
+                              builder: (context) => const ClassifyPage()),
                         );
                       },
                       icon: const Icon(
