@@ -9,6 +9,7 @@ import 'package:plog_us/app/view/leaderboard_page/leaderboard_page.dart';
 import 'package:plog_us/app/view/login_page/login_page.dart';
 import 'package:plog_us/app/view/map_page/map_page.dart';
 import 'package:plog_us/app/view/mypage_page/mypage_page.dart';
+import 'package:plog_us/app/view/quiz_page/quiz_page.dart';
 import 'package:plog_us/app/view/signup_page/signup_page.dart';
 import 'package:plog_us/app/view/theme/app_colors.dart';
 
@@ -142,7 +143,7 @@ class MainPage extends BaseView<MainController> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const LoginScreen()),
+                              builder: (context) => const QuizScreen()),
                         );
                       },
                       icon: const Icon(
@@ -150,7 +151,7 @@ class MainPage extends BaseView<MainController> {
                         color: AppColors.black,
                       ),
                       label: const Text(
-                        'Login',
+                        'Quiz',
                         style: TextStyle(
                           fontSize: 23,
                           color: AppColors.black,

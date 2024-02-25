@@ -11,7 +11,7 @@ class AppPages {
   AppPages._();
 
   // LOGIN 페이지 추가되면 바꾸기
-  static const INITIAL = Routes.MAIN;
+  static const INITIAL = Routes.LOGIN;
 
   static final pages = [
     GetPage(
