@@ -31,7 +31,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
   }
 
   Future<void> _uploadImage(String userUuid) async {
-    String apiUrl = 'http://35.212.137.41:8080/editprofile/$userUuid';
+    String apiUrl = 'http://35.212.208.171:8080/editprofile/$userUuid';
     if (_imageFile == null) {
       showBlackPopup("갤러리에서 이미지를 선택하세요");
       return;
@@ -63,7 +63,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
   }
 
   Future<void> _deleteImage(String userUUid) async {
-    String apiUrl = 'http://35.212.137.41:8080/deleteprofile/$userUUid';
+    String apiUrl = 'http://35.212.208.171:8080/deleteprofile/$userUUid';
 
     try {
       var response = await http.delete(Uri.parse(apiUrl));
@@ -290,7 +290,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
   }
 
   Future _fetchUserData(String userUuid) async {
-    String apiUrl = 'http://35.212.137.41:8080/mypage/$userUuid';
+    String apiUrl = 'http://35.212.208.171:8080/mypage/$userUuid';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -326,7 +326,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
   }
 
   Future<void> updateUsername(String newUsername, String userId) async {
-    String apiUrl = 'http://35.212.137.41:8080/modify/username/$userId';
+    String apiUrl = 'http://35.212.208.171:8080/modify/username/$userId';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -359,7 +359,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
 
   Future<void> updatePassword(String newPassword, String userId) async {
     LoginController loginController = Get.find<LoginController>();
-    String apiUrl = 'http://35.212.137.41:8080/modify/password/$userId';
+    String apiUrl = 'http://35.212.208.171:8080/modify/password/$userId';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',

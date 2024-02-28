@@ -54,7 +54,8 @@ class _PlogLogScreenState extends State<PlogLogScreen> {
   }
 
   Future fetchData(String userUUid) async {
-    var uri = Uri.parse('http://35.212.137.41:8080/plogginglog/list/$userUUid');
+    var uri =
+        Uri.parse('http://35.212.208.171:8080/plogginglog/list/$userUUid');
     //print('id : ${loginController.userId.value}');
 
     try {

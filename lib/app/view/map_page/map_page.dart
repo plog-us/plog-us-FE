@@ -197,7 +197,7 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<void> _fetchLocations() async {
     final response =
-        await http.get(Uri.parse('http://35.212.137.41:8080/ploglocation'));
+        await http.get(Uri.parse('http://35.212.208.171:8080/ploglocation'));
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
       final List<Location> locations =
@@ -299,7 +299,7 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<void> _postStartPlog(String plogUuid, String userUuid) async {
     String apiUrl =
-        'http://35.212.137.41:8080/startplogging/$userUuid/$plogUuid';
+        'http://35.212.208.171:8080/startplogging/$userUuid/$plogUuid';
 
     try {
       print(apiUrl);
@@ -321,7 +321,7 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _postStopPlog(String ploggingUuid) async {
-    String apiUrl = 'http://35.212.137.41:8080/finishplogging/$ploggingUuid';
+    String apiUrl = 'http://35.212.208.171:8080/finishplogging/$ploggingUuid';
     String finaldistance = plogdistance.toString();
 
     Map<String, dynamic> requestData = {'ploggingDistance': finaldistance};

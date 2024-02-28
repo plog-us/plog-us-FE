@@ -33,7 +33,7 @@ class _FinishScreenState extends State<FinishScreen> {
   }
 
   Future<void> _getWastebin() async {
-    String apiUrl = 'http://35.212.137.41:8080/wastebin/${widget.finalUuid}';
+    String apiUrl = 'http://35.212.208.171:8080/wastebin/${widget.finalUuid}';
 
     try {
       print(apiUrl);

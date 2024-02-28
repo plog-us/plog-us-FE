@@ -99,7 +99,7 @@ class SettingPage extends StatelessWidget {
   }
 
   Future _fetchUserData(String userUuid) async {
-    String apiUrl = 'http://35.212.137.41:8080/mypage/$userUuid';
+    String apiUrl = 'http://35.212.208.171:8080/mypage/$userUuid';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));

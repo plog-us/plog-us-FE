@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future _fetchUserData(String userId) async {
-    String apiUrl = 'http://35.212.137.41:8080/user/$userId';
+    String apiUrl = 'http://35.212.208.171:8080/user/$userId';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -213,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
 
-    String url = 'http://35.212.137.41:8080/login';
+    String url = 'http://35.212.208.171:8080/login';
 
     Map<String, dynamic> body = {
       'email': email,

@@ -182,7 +182,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
 
-    String url = 'http://35.212.137.41:8080/join';
+    String url = 'http://35.212.208.171:8080/join';
 
     Map<String, dynamic> body = {
       'username': name,

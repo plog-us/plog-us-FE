@@ -128,7 +128,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   }
 
   Future fetchData(String query) async {
-    var uri = Uri.parse("http://35.212.137.41:8080/leaderboard/$query");
+    var uri = Uri.parse("http://35.212.208.171:8080/leaderboard/$query");
 
     try {
       mhttp.Response response = await mhttp.get(uri);
