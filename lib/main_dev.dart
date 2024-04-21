@@ -8,7 +8,7 @@ import 'package:plog_us/flavors/environment.dart';
 void main() async {
   EnvConfig devConfig = EnvConfig(
     appName: "Plog-Us",
-    baseUrl: "",
+    baseUrl: "http://35.185.230.16:8080",
     shouldCollectCrashLog: true,
   );
 

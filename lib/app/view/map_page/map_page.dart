@@ -14,6 +14,7 @@ import 'package:plog_us/app/view/map_page/finish_page.dart';
 import 'package:plog_us/app/view/plog_log_page/plog_log_page.dart';
 import 'package:plog_us/app/view/theme/app_colors.dart';
 import 'package:plog_us/app/controllers/login/login_controller.dart';
+import 'package:plog_us/flavors/build_config.dart';
 
 class Location {
   final int plogUuid;
@@ -196,8 +197,8 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _fetchLocations() async {
-    final response =
-        await http.get(Uri.parse('http://35.212.208.171:8080/ploglocation'));
+    final response = await http
+        .get(Uri.parse('${BuildConfig.instance.config.baseUrl}/ploglocation'));
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
       final List<Location> locations =
@@ -299,7 +300,7 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<void> _postStartPlog(String plogUuid, String userUuid) async {
     String apiUrl =
-        'http://35.212.208.171:8080/startplogging/$userUuid/$plogUuid';
+        '${BuildConfig.instance.config.baseUrl}/startplogging/$userUuid/$plogUuid';
 
     try {
       print(apiUrl);
@@ -321,7 +322,8 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _postStopPlog(String ploggingUuid) async {
-    String apiUrl = 'http://35.212.208.171:8080/finishplogging/$ploggingUuid';
+    String apiUrl =
+        '${BuildConfig.instance.config.baseUrl}/finishplogging/$ploggingUuid';
     String finaldistance = plogdistance.toString();
 
     Map<String, dynamic> requestData = {'ploggingDistance': finaldistance};

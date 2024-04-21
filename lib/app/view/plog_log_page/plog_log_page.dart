@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:plog_us/app/controllers/login/login_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as mhttp;
+import 'package:plog_us/flavors/build_config.dart';
 
 class PlogLogScreen extends StatefulWidget {
   const PlogLogScreen({super.key});
@@ -54,8 +55,8 @@ class _PlogLogScreenState extends State<PlogLogScreen> {
   }
 
   Future fetchData(String userUUid) async {
-    var uri =
-        Uri.parse('http://35.212.208.171:8080/plogginglog/list/$userUUid');
+    var uri = Uri.parse(
+        '${BuildConfig.instance.config.baseUrl}/plogginglog/list/$userUUid');
     //print('id : ${loginController.userId.value}');
 
     try {

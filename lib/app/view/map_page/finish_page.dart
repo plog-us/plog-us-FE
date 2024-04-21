@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:plog_us/app/view/theme/app_colors.dart';
 import 'package:http/http.dart' as http;
+import 'package:plog_us/flavors/build_config.dart';
 
 class FinishScreen extends StatefulWidget {
   final String locationName;
@@ -33,7 +34,8 @@ class _FinishScreenState extends State<FinishScreen> {
   }
 
   Future<void> _getWastebin() async {
-    String apiUrl = 'http://35.212.208.171:8080/wastebin/${widget.finalUuid}';
+    String apiUrl =
+        '${BuildConfig.instance.config.baseUrl}/wastebin/${widget.finalUuid}';
 
     try {
       print(apiUrl);

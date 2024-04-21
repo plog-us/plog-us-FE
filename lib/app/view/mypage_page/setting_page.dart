@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:plog_us/app/controllers/login/login_controller.dart';
+import 'package:plog_us/flavors/build_config.dart';
 
 class SettingPage extends StatelessWidget {
   const SettingPage({super.key});
@@ -99,7 +100,7 @@ class SettingPage extends StatelessWidget {
   }
 
   Future _fetchUserData(String userUuid) async {
-    String apiUrl = 'http://35.212.208.171:8080/mypage/$userUuid';
+    String apiUrl = '${BuildConfig.instance.config.baseUrl}/mypage/$userUuid';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));

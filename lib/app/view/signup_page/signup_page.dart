@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'package:plog_us/flavors/build_config.dart';
 import 'package:plog_us/app/view/theme/app_colors.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -182,7 +182,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
 
-    String url = 'http://35.212.208.171:8080/join';
+    String url = '${BuildConfig.instance.config.baseUrl}/join';
 
     Map<String, dynamic> body = {
       'username': name,

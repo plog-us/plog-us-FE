@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:plog_us/app/controllers/login/login_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as mhttp;
+import 'package:plog_us/flavors/build_config.dart';
 
 class QuizScreen extends StatefulWidget {
   const QuizScreen({super.key});
@@ -187,7 +188,8 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   Future fetchData(String userUUid) async {
-    var uri = Uri.parse('http://35.212.208.171:8080/quiz/$userUUid');
+    var uri =
+        Uri.parse('${BuildConfig.instance.config.baseUrl}/quiz/$userUUid');
     //print('id : ${loginController.userId.value}');
 
     try {
@@ -210,7 +212,8 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   Future<void> uploadQuiz(String userUuid, String quizUuid) async {
-    String apiUrl = 'http://35.212.208.171:8080/$userUuid/$quizUuid';
+    String apiUrl =
+        '${BuildConfig.instance.config.baseUrl}/$userUuid/$quizUuid';
     print('upload quiz : $apiUrl');
     try {
       mhttp.Response response = await mhttp.post(Uri.parse(apiUrl));

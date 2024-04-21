@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as mhttp;
+import 'package:plog_us/flavors/build_config.dart';
 
 class LeaderboardScreen extends StatefulWidget {
   const LeaderboardScreen({super.key});
@@ -128,7 +129,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   }
 
   Future fetchData(String query) async {
-    var uri = Uri.parse("http://35.212.208.171:8080/leaderboard/$query");
+    var uri =
+        Uri.parse("${BuildConfig.instance.config.baseUrl}/leaderboard/$query");
 
     try {
       mhttp.Response response = await mhttp.get(uri);

@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:plog_us/app/controllers/login/login_controller.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:plog_us/app/view/theme/app_colors.dart';
+import 'package:plog_us/flavors/build_config.dart';
 
 class MyPageScreen extends StatefulWidget {
   const MyPageScreen({super.key});
@@ -31,7 +32,8 @@ class _MyPageScreenState extends State<MyPageScreen> {
   }
 
   Future<void> _uploadImage(String userUuid) async {
-    String apiUrl = 'http://35.212.208.171:8080/editprofile/$userUuid';
+    String apiUrl =
+        '${BuildConfig.instance.config.baseUrl}/editprofile/$userUuid';
     if (_imageFile == null) {
       showBlackPopup("갤러리에서 이미지를 선택하세요");
       return;
@@ -63,7 +65,8 @@ class _MyPageScreenState extends State<MyPageScreen> {
   }
 
   Future<void> _deleteImage(String userUUid) async {
-    String apiUrl = 'http://35.212.208.171:8080/deleteprofile/$userUUid';
+    String apiUrl =
+        '${BuildConfig.instance.config.baseUrl}/deleteprofile/$userUUid';
 
     try {
       var response = await http.delete(Uri.parse(apiUrl));
@@ -290,7 +293,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
   }
 
   Future _fetchUserData(String userUuid) async {
-    String apiUrl = 'http://35.212.208.171:8080/mypage/$userUuid';
+    String apiUrl = '${BuildConfig.instance.config.baseUrl}/mypage/$userUuid';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -326,7 +329,8 @@ class _MyPageScreenState extends State<MyPageScreen> {
   }
 
   Future<void> updateUsername(String newUsername, String userId) async {
-    String apiUrl = 'http://35.212.208.171:8080/modify/username/$userId';
+    String apiUrl =
+        '${BuildConfig.instance.config.baseUrl}/modify/username/$userId';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -359,7 +363,8 @@ class _MyPageScreenState extends State<MyPageScreen> {
 
   Future<void> updatePassword(String newPassword, String userId) async {
     LoginController loginController = Get.find<LoginController>();
-    String apiUrl = 'http://35.212.208.171:8080/modify/password/$userId';
+    String apiUrl =
+        '${BuildConfig.instance.config.baseUrl}/modify/password/$userId';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',

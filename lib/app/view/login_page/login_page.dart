@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:plog_us/app/controllers/login/login_controller.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:plog_us/app/view/theme/app_colors.dart';
+import 'package:plog_us/flavors/build_config.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -46,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future _fetchUserData(String userId) async {
-    String apiUrl = 'http://35.212.208.171:8080/user/$userId';
+    String apiUrl = '${BuildConfig.instance.config.baseUrl}/$userId';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -213,7 +214,7 @@ class _LoginScreenState extends State<LoginScreen> {
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
 
-    String url = 'http://35.212.208.171:8080/login';
+    String url = '${BuildConfig.instance.config.baseUrl}/login';
 
     Map<String, dynamic> body = {
       'email': email,
