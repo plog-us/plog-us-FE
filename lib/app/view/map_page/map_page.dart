@@ -291,6 +291,7 @@ class _MapScreenState extends State<MapScreen> {
               Decimal.parse(distance.toStringAsFixed(1));
           String plogDistanceString = plogDistanceDecimal.toString();
           print('현재 위치와 선택한 플로깅 위치 간의 거리: $plogdistance 킬로미터');
+          plogdistance = plogDistanceString;
         });
       });
     } else {
@@ -325,6 +326,7 @@ class _MapScreenState extends State<MapScreen> {
     String apiUrl =
         '${BuildConfig.instance.config.baseUrl}/finishplogging/$ploggingUuid';
     String finaldistance = plogdistance.toString();
+    print('플로깅 종료 거리 $finaldistance $plogdistance');
 
     Map<String, dynamic> requestData = {'ploggingDistance': finaldistance};
 
