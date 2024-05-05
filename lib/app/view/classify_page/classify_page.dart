@@ -49,7 +49,7 @@ class _ClassifyPageState extends State<ClassifyPage> {
 
   // 이미지 분류
   Future classifyImage(File image) async {
-    print("asdasddas$image");
+    print('${image.path} image');
     var output = await Tflite.runModelOnImage(
         path: image.path,
         imageMean: 0.0, // defaults to 117.0
@@ -153,6 +153,9 @@ class _ClassifyPageState extends State<ClassifyPage> {
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
     return Scaffold(
+        appBar: AppBar(
+          title: const Text('Classify'),
+        ),
         backgroundColor: const Color(0xfff4f3f9),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -177,6 +180,8 @@ class _ClassifyPageState extends State<ClassifyPage> {
                     await getImage(ImageSource.camera);
                     recycleDialog();
                   },
+                  backgroundColor: const Color(0xff1ea271),
+                  foregroundColor: Colors.white,
                   child: const Icon(Icons.add_a_photo),
                 ),
 
@@ -188,6 +193,8 @@ class _ClassifyPageState extends State<ClassifyPage> {
                     await getImage(ImageSource.gallery);
                     recycleDialog();
                   },
+                  backgroundColor: const Color(0xff1ea271),
+                  foregroundColor: Colors.white,
                   child: const Icon(Icons.wallpaper),
                 ),
               ],

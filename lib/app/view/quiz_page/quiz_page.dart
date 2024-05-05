@@ -31,7 +31,11 @@ class _QuizScreenState extends State<QuizScreen> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const CircularProgressIndicator();
                 } else if (snapshot.hasError) {
-                  return Text("Error: ${snapshot.error}");
+                  return const Center(
+                    heightFactor: 10,
+                    widthFactor: 10,
+                    child: Text("Todays Quiz is done"),
+                  );
                 } else {
                   print(snapshot.data);
                   return Center(
@@ -73,8 +77,9 @@ class _QuizScreenState extends State<QuizScreen> {
                                       builder: acDialog,
                                     );
                                     uploadQuiz(
+                                      "correct",
                                       loginController.userId.value,
-                                      snapshot.data['qestionUuid'].toString(),
+                                      snapshot.data['questionUuid'],
                                     );
                                   } else {
                                     print("오답");
@@ -83,8 +88,9 @@ class _QuizScreenState extends State<QuizScreen> {
                                       builder: waDialog,
                                     );
                                     uploadQuiz(
+                                      "incorrect",
                                       loginController.userId.value,
-                                      snapshot.data['questionUuid'].toString(),
+                                      snapshot.data['questionUuid'],
                                     );
                                   }
                                 },
@@ -110,8 +116,9 @@ class _QuizScreenState extends State<QuizScreen> {
                                       builder: acDialog,
                                     );
                                     uploadQuiz(
+                                      "correct",
                                       loginController.userId.value,
-                                      snapshot.data['questionUuid'].toString(),
+                                      snapshot.data['questionUuid'],
                                     );
                                   } else {
                                     print("오답");
@@ -120,8 +127,9 @@ class _QuizScreenState extends State<QuizScreen> {
                                       builder: waDialog,
                                     );
                                     uploadQuiz(
+                                      "incorrect",
                                       loginController.userId.value,
-                                      snapshot.data['questionUuid'].toString(),
+                                      snapshot.data['questionUuid'],
                                     );
                                   }
                                 },
@@ -201,7 +209,7 @@ class _QuizScreenState extends State<QuizScreen> {
       print("----------------------------------");
       print(response.headers);
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        return jsonDecode(utf8.decode(response.bodyBytes));
       } else {
         throw Exception("Failed to load data");
       }
@@ -211,9 +219,9 @@ class _QuizScreenState extends State<QuizScreen> {
     }
   }
 
-  Future<void> uploadQuiz(String userUuid, String quizUuid) async {
+  Future<void> uploadQuiz(String ans, String userUuid, int quizUuid) async {
     String apiUrl =
-        '${BuildConfig.instance.config.baseUrl}/$userUuid/$quizUuid';
+        '${BuildConfig.instance.config.baseUrl}/quiz/$ans/$userUuid/$quizUuid';
     print('upload quiz : $apiUrl');
     try {
       mhttp.Response response = await mhttp.post(Uri.parse(apiUrl));
